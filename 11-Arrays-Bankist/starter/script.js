@@ -61,9 +61,27 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+let activeAccount;
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
+
+// function displayMovement(movements) {
+//   containerMovements.innerHTML = '';
+//   movements.forEach((movement, i) => {
+//     let type = movement < 0 ? 'withdrawal' : 'deposit';
+//     let html = `
+//     <div class="movements__row">
+//           <div class="movements__type movements__type--${type}">${
+//       i + 1
+//     } ${type}</div>
+//           <div class="movements__date">3 days ago</div>
+//           <div class="movements__value">${movement}€</div>
+//         </div>
+//     `;
+//     containerMovements.innerHTML = html + containerMovements.innerHTML;
+//   });
+// }
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -71,6 +89,139 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+function init() {
+  containerApp.style.display = 'none';
+  accounts.forEach(element => {
+    let shortForm = '';
+    let totalAmount = 0;
+    element.username = element.owner.split(' ');
+    for (let i of element.username) shortForm += i[0];
+    element.username = shortForm.toLowerCase();
+    element.movements;
+    element.movements.forEach(i => (totalAmount += i));
+    element.balance = totalAmount;
+  });
+}
 
-/////////////////////////////////////////////////
+btnLogin.addEventListener('click', () => {
+  console.log('login clicked');
+  let username = inputLoginUsername.value;
+  let pin = inputLoginPin.value;
+
+  accounts.forEach(i => {
+    if (i.username == username && i.pin == pin) {
+      activeAccount = i;
+      displayInterface(i);
+    }
+  });
+  inputLoginPin.value = '';
+  inputLoginUsername.value = '';
+});
+
+function displayInterface(obj) {
+  containerApp.style.display = '';
+  setTimeout(() => {
+    containerApp.style.opacity = 1;
+  }, 0);
+  labelWelcome.textContent = `Good Afternoon, ${obj.owner.slice(
+    0,
+    obj.owner.indexOf(' ')
+  )}!`;
+  let date = new Date();
+  labelDate.textContent = `${new Date().toLocaleDateString()}, ${date.getHours()}:${date.getMinutes()}`;
+  labelBalance.textContent = obj.balance + '\t€';
+  displayMovements(obj.movements);
+  displayStats(obj.movements, obj.interestRate);
+}
+function displayMovements(movements) {
+  containerMovements.innerHTML = '';
+  movements.forEach((i, j) => {
+    let type = i < 0 ? 'withdrawal' : 'deposit';
+    let html = `
+    <div class="movements__row">
+          <div class="movements__type movements__type--${type}">${
+      j + 1
+    } ${type}</div>
+          <div class="movements__date">3 days ago</div>
+          <div class="movements__value">${i}€</div>
+        </div>
+    `;
+
+    containerMovements.innerHTML = html + containerMovements.innerHTML;
+  });
+}
+function displayStats(movements, interestRate) {
+  let sumIn = 0,
+    sumOut = 0,
+    interest = 0;
+  movements.forEach(i => {
+    if (i < 0) sumOut += Math.abs(i);
+    else sumIn += i;
+  });
+  interest = sumIn * interestRate;
+
+  labelSumIn.textContent = sumIn;
+  labelSumOut.textContent = sumOut;
+  labelSumInterest.textContent = interest;
+}
+function logout() {
+  labelWelcome.textContent = 'Log in to get started';
+  containerApp.style.opacity = 0;
+  setTimeout(() => {
+    containerApp.style.display = 'none';
+  }, 500);
+}
+
+btnTransfer.addEventListener('click', () => {
+  let to = inputTransferTo.value;
+  let amt = parseInt(inputTransferAmount.value);
+  console.log(to + ' ' + amt);
+  for (let i of accounts) {
+    if (i.username == to && i.username != activeAccount.username) {
+      if (amt <= activeAccount.balance) {
+        activeAccount.balance -= amt;
+        activeAccount.movements.push(amt * -1);
+        i.balance += amt;
+        i.movements.push(amt);
+      }
+    }
+  }
+  inputTransferTo.value = '';
+  inputTransferAmount.value = '';
+  displayInterface(activeAccount);
+});
+
+btnLoan.addEventListener('click', () => {
+  let amt = parseInt(inputLoanAmount.value);
+  setTimeout(() => {
+    activeAccount.balance += amt;
+    activeAccount.movements.push(amt);
+    displayInterface(activeAccount);
+  }, 2000);
+  console.log('Processing Loan....please wait');
+  inputLoanAmount.value = '';
+});
+
+btnClose.addEventListener('click', () => {
+  let user = inputCloseUsername.value;
+  let pin = inputClosePin.value;
+  if (user == activeAccount.username && pin == activeAccount.pin) {
+    let i,
+      found = false;
+    for (let i = 0; i < accounts.length; i++) {
+      if (
+        accounts[i].username == activeAccount.username &&
+        accounts[i].pin == activeAccount.pin
+      ) {
+        logout();
+        accounts.splice(i, 1);
+        break;
+      }
+    }
+  } else console.log('Incorrect Credentials');
+
+  inputClosePin.value = '';
+  inputCloseUsername.value = '';
+});
+
+init();
