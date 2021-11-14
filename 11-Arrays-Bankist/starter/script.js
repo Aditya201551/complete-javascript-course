@@ -133,7 +133,7 @@ function displayInterface(obj) {
   displayMovements(obj.movements);
   displayStats(obj.movements, obj.interestRate);
 }
-function displayMovements(movements) {
+function displayMovements(movements, orderedDate = false) {
   containerMovements.innerHTML = '';
   movements.forEach((i, j) => {
     let type = i < 0 ? 'withdrawal' : 'deposit';
@@ -146,8 +146,9 @@ function displayMovements(movements) {
           <div class="movements__value">${i}€</div>
         </div>
     `;
-
-    containerMovements.innerHTML = html + containerMovements.innerHTML;
+    if (!orderedDate)
+      containerMovements.innerHTML = html + containerMovements.innerHTML;
+    else containerMovements.innerHTML += html;
   });
 }
 function displayStats(movements, interestRate) {
@@ -206,8 +207,6 @@ btnClose.addEventListener('click', () => {
   let user = inputCloseUsername.value;
   let pin = inputClosePin.value;
   if (user == activeAccount.username && pin == activeAccount.pin) {
-    let i,
-      found = false;
     for (let i = 0; i < accounts.length; i++) {
       if (
         accounts[i].username == activeAccount.username &&
@@ -222,6 +221,16 @@ btnClose.addEventListener('click', () => {
 
   inputClosePin.value = '';
   inputCloseUsername.value = '';
+});
+let checkSort = false;
+btnSort.addEventListener('click', () => {
+  if (checkSort) {
+    displayMovements(activeAccount.movements, true);
+    checkSort = false;
+  } else {
+    displayMovements(activeAccount.movements, false);
+    checkSort = true;
+  }
 });
 
 init();
