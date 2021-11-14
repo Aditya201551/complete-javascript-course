@@ -397,14 +397,12 @@ And now explain to YOURSELF (or someone around you) WHY this worked! Take all th
 GOOD LUCK 😀
 */
 
-/*
 (function () {
   const header = document.querySelector('h1');
   header.style.color = 'red';
 
+  //closure function
   document.querySelector('body').addEventListener('click', function () {
     header.style.color = 'blue';
   });
 })();
-*/
-
