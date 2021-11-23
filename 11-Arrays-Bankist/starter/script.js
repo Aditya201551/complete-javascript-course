@@ -62,26 +62,21 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 let activeAccount;
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
+let time = 10;
+let timer = setInterval(() => {
+  let minute = String(Math.floor(time / 60)).padStart(2, '0');
+  let second = String(time - minute * 60).padStart(2, '0');
+  labelTimer.textContent = `${minute}:${second}`;
+  if (time <= 0) {
+    logout();
+    clearInterval(timer);
+  }
+  time -= 1;
+}, 1000);
 
-// function displayMovement(movements) {
-//   containerMovements.innerHTML = '';
-//   movements.forEach((movement, i) => {
-//     let type = movement < 0 ? 'withdrawal' : 'deposit';
-//     let html = `
-//     <div class="movements__row">
-//           <div class="movements__type movements__type--${type}">${
-//       i + 1
-//     } ${type}</div>
-//           <div class="movements__date">3 days ago</div>
-//           <div class="movements__value">${movement}€</div>
-//         </div>
-//     `;
-//     containerMovements.innerHTML = html + containerMovements.innerHTML;
-//   });
-// }
+function timerReset() {
+  time = 10;
+}
 
 const currencies = new Map([
   ['USD', 'United States dollar'],
@@ -129,7 +124,8 @@ function displayInterface(obj) {
   )}!`;
   let date = new Date();
   labelDate.textContent = `${new Date().toLocaleDateString()}, ${date.getHours()}:${date.getMinutes()}`;
-  labelBalance.textContent = obj.balance + '\t€';
+  labelBalance.textContent =
+    Intl.NumberFormat(navigator.language).format(obj.balance) + '\t€';
   displayMovements(obj.movements);
   displayStats(obj.movements, obj.interestRate);
 }
@@ -150,6 +146,7 @@ function displayMovements(movements, orderedDate = false) {
       containerMovements.innerHTML = html + containerMovements.innerHTML;
     else containerMovements.innerHTML += html;
   });
+  timerReset();
 }
 function displayStats(movements, interestRate) {
   let sumIn = 0,
