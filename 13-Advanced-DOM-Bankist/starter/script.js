@@ -55,3 +55,71 @@ document.querySelector('.btn--scroll-to').addEventListener('click', e => {
   //modern way
   sectionOne.scrollIntoView({ behavior: 'smooth' });
 });
+//adding event listener to all the elements separately(creating a copy in forEach loop)
+// document.querySelectorAll('.nav__link').forEach(i => {
+//   i.addEventListener('click', e => {
+//     e.preventDefault();
+//     // console.log(this);
+//     const id = i.getAttribute('href');
+//     document.querySelector(id).scrollIntoView({
+//       behavior: 'smooth',
+//     });
+//   });
+// });
+
+//using eventDelegation(applying eventListener to the parent element of all the child element)
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  const currentElement = e.target;
+  e.preventDefault();
+  console.log(currentElement);
+  document.querySelector(currentElement.getAttribute('href')).scrollIntoView({
+    behavior: 'smooth',
+  });
+});
+
+//tabbed component
+let tabs = document.querySelectorAll('.operations__tab');
+let contents = document.querySelectorAll('.operations__content');
+document
+  .querySelector('.operations__tab-container')
+  .addEventListener('click', function (e) {
+    let tab = e.target.closest('.operations__tab');
+    if (e.target == this) {
+      console.log('outside');
+      return;
+    }
+    // console.log(e.target);
+    tabs.forEach(i => {
+      i.classList.remove('operations__tab--active');
+    });
+    tab.classList.add('operations__tab--active');
+    let activeContent = document.querySelector(
+      `.operations__content--${tab.dataset.tab}`
+    );
+    contents.forEach(i => {
+      i.classList.remove('operations__content--active');
+    });
+    // console.log(activeContent);
+    activeContent.classList.add('operations__content--active');
+  });
+//nav link
+document
+  .querySelector('.nav__links')
+  .addEventListener('mouseover', function (e) {
+    if (e.target == this) {
+      // console.log('mouseover');
+      for (let i of this.children) i.firstElementChild.style.opacity = 0.5;
+      // e.target.style.opacity = 1;
+      return;
+    }
+    // console.log(e.target);
+    for (let i of this.children) i.firstElementChild.style.opacity = 0.5;
+    e.target.style.opacity = 1;
+  });
+
+document
+  .querySelector('.nav__links')
+  .addEventListener('mouseout', function (e) {
+    // console.log('mouseout');
+    for (let i of this.children) i.firstElementChild.style.opacity = 1;
+  });
