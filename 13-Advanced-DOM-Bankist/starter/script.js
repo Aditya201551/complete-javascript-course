@@ -192,7 +192,7 @@ const imageObserver = new IntersectionObserver(
     entry.target.addEventListener('load', () => {
       entry.target.classList.remove('lazy-img');
     });
-    console.log('observed');
+    // console.log('observed');
     observer.unobserve(entry.target);
   },
   {
@@ -208,12 +208,13 @@ let slides = document.querySelectorAll('.slide');
 //buttons
 let buttonLeft = document.querySelector('.slider__btn--left');
 let buttonRight = document.querySelector('.slider__btn--right');
-gotoSlide(0);
 function gotoSlide(slide) {
   slides.forEach((s, i) => {
     s.style.transform = `translateX(${100 * (i - slide)}%)`;
   });
 }
+gotoSlide(0);
+
 let currentSlide = 0;
 let maxSlide = slides.length - 1;
 buttonRight.addEventListener('click', () => {
