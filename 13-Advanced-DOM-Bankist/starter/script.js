@@ -71,7 +71,7 @@ document.querySelector('.btn--scroll-to').addEventListener('click', e => {
 document.querySelector('.nav__links').addEventListener('click', function (e) {
   const currentElement = e.target;
   e.preventDefault();
-  console.log(currentElement);
+  // console.log(currentElement);
   document.querySelector(currentElement.getAttribute('href')).scrollIntoView({
     behavior: 'smooth',
   });
@@ -123,3 +123,107 @@ document
     // console.log('mouseout');
     for (let i of this.children) i.firstElementChild.style.opacity = 1;
   });
+
+//sticky navigation
+let nav = document.querySelector('.nav');
+let section1Coord = document.querySelector('#section--1');
+// window.addEventListener('scroll', () => {
+//   if (window.scrollY > section1Coord.getBoundingClientRect().top)
+//     nav.classList.add('sticky');
+//   else nav.classList.remove('sticky');
+// });
+
+// function obsCallback(entries, observer) {
+//   console.log(entries);
+//   console.log(observer);
+// }
+
+// const obsOption = {
+//   root: null,
+//   threshold: 0,
+// };
+
+// const observer = new IntersectionObserver(obsCallback, obsOption);
+// observer.observe(header);
+
+//sticky navigation
+const headerObserver = new IntersectionObserver(
+  entries => {
+    const [entry] = entries;
+    // console.log(entry);
+    if (entry.isIntersecting) nav.classList.remove('sticky');
+    else nav.classList.add('sticky');
+  },
+  {
+    root: null,
+    threshold: 0,
+    rootMargin: '-90px',
+  }
+);
+headerObserver.observe(header);
+
+//reveal sections
+let sections = document.querySelectorAll('.section');
+const sectionObserver = new IntersectionObserver(
+  (entries, observe) => {
+    let [entry] = entries;
+    if (entry.isIntersecting) entry.target.classList.remove('section--hidden');
+    else entry.target.classList.add('section--hidden');
+    // console.log(observe);
+  },
+  {
+    root: null,
+    threshold: 0.15,
+  }
+);
+sections.forEach(i => {
+  sectionObserver.observe(i);
+  // i.classList.add('section--hidden');
+});
+
+//lazy loading of images
+const images = document.querySelectorAll('img[data-src]');
+const imageObserver = new IntersectionObserver(
+  (entries, observer) => {
+    let [entry] = entries;
+    if (!entry.isIntersecting) return;
+
+    entry.target.src = entry.target.dataset.src;
+    entry.target.addEventListener('load', () => {
+      entry.target.classList.remove('lazy-img');
+    });
+    console.log('observed');
+    observer.unobserve(entry.target);
+  },
+  {
+    root: null,
+    threshold: 1,
+  }
+);
+images.forEach(i => imageObserver.observe(i));
+
+//image slider
+let slides = document.querySelectorAll('.slide');
+
+//buttons
+let buttonLeft = document.querySelector('.slider__btn--left');
+let buttonRight = document.querySelector('.slider__btn--right');
+gotoSlide(0);
+function gotoSlide(slide) {
+  slides.forEach((s, i) => {
+    s.style.transform = `translateX(${100 * (i - slide)}%)`;
+  });
+}
+let currentSlide = 0;
+let maxSlide = slides.length - 1;
+buttonRight.addEventListener('click', () => {
+  if (currentSlide === maxSlide) currentSlide = 0;
+  else currentSlide++;
+  gotoSlide(currentSlide);
+});
+
+buttonLeft.addEventListener('click', () => {
+  if (currentSlide == 0) currentSlide = maxSlide;
+  else currentSlide--;
+  gotoSlide(currentSlide);
+});
