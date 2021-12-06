@@ -272,3 +272,9 @@ function activateDot(dotNumber) {
 window.addEventListener('load', () => {
   console.log('Page loaded completely');
 });
+
+document.querySelector('#logo').addEventListener('click', () =>
+  document.querySelector('.header').scrollIntoView({
+    behavior: 'smooth',
+  })
+);
